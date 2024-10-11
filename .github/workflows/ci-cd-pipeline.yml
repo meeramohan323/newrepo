@@ -45,7 +45,7 @@ jobs:
     - name: Set up kubectl
       uses: azure/setup-kubectl@v1
       with:
-        version: '1.31.1'  # Use the same version as your local setup
+        version: '1.24.0'  # Use a stable version
 
     - name: Set kubeconfig
       run: echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
