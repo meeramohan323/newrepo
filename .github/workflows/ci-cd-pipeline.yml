@@ -3,29 +3,49 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - main  # Change this to your default branch if needed
+  pull_request:
+    branches:
+      - main  # Change this to your default branch if needed
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out code
+    - name: Checkout code
       uses: actions/checkout@v2
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: Dockerfile
         push: true
-        tags: your_dockerhub_username/your_image_name:latest
+        tags: meeramohan323/wisecow:latest  # Change this to your Docker Hub repo
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
     - name: Create kube directory
       run: mkdir -p $HOME/.kube
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v1
+      with:
+        version: '1.31.1'  # Use the same version as your local setup
 
     - name: Set kubeconfig
       run: echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
@@ -34,4 +54,3 @@ jobs:
       run: |
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
-
