@@ -44,8 +44,10 @@ jobs:
         with:
           version: 'latest'  # Use 'latest' to always get the latest version
 
-      - name: Create kube directory
-        run: mkdir -p $HOME/.kube
+      - name: Create kube and minikube directories
+        run: |
+          mkdir -p $HOME/.kube
+          mkdir -p $HOME/.minikube/profiles/minikube
      
       - name: Set kubeconfig
         run: |
