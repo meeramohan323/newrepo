@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Change this to your default branch if needed
+      - main
   pull_request:
     branches:
-      - main  # Change this to your default branch if needed
+      - main
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: meeramohan323/wisecow:latest  # Change this to your Docker Hub repo
+        tags: meeramohan323/wisecow:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -39,13 +39,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Create kube directory
-      run: mkdir -p $HOME/.kube
-
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v1
-      with:
-        version: '1.24.0'  # Use a stable version
+    - name: Install kubectl
+      run: |
+        curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x ./kubectl
+        sudo mv ./kubectl /usr/local/bin/kubectl
 
     - name: Set kubeconfig
       run: echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
