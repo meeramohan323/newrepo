@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger the workflow on push to the main branch
+      - main  # Change this to your default branch if needed
   pull_request:
     branches:
-      - main  # Trigger the workflow on pull requests to the main branch
+      - main  # Change this to your default branch if needed
 
 jobs:
   build:
@@ -35,6 +35,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -48,13 +49,13 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
           mkdir -p $HOME/.minikube/profiles/minikube
-     
-      - name: Set kubeconfig and Minikube certificates
+
+      - name: Set kubeconfig and certificates
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-          echo "${{ secrets.MINIKUBE_CLIENT_CERT }}" | base64 -d > $HOME/.minikube/profiles/minikube/client.crt
-          echo "${{ secrets.MINIKUBE_CLIENT_KEY }}" | base64 -d > $HOME/.minikube/profiles/minikube/client.key
-          echo "${{ secrets.MINIKUBE_CA_CERT }}" | base64 -d > $HOME/.minikube/ca.crt
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+          echo "${{ secrets.MINIKUBE_CLIENT_CERT }}" > $HOME/.minikube/profiles/minikube/client.crt
+          echo "${{ secrets.MINIKUBE_CLIENT_KEY }}" > $HOME/.minikube/profiles/minikube/client.key
+          echo "${{ secrets.MINIKUBE_CA_CERT }}" > $HOME/.minikube/ca.crt
 
       - name: Deploy to Kubernetes
         run: |
