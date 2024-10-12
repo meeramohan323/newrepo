@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Change this to your default branch if needed
+      - main
   pull_request:
     branches:
-      - main  # Change this to your default branch if needed
+      - main
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: meeramohan323/wisecow:latest  # Change this to your Docker Hub repo
+          tags: meeramohan323/wisecow:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
         with:
-          version: 'latest'  # Use 'latest' to always get the latest version
+          version: 'latest'
 
       - name: Create kube and minikube directories
         run: |
@@ -52,10 +52,10 @@ jobs:
 
       - name: Set kubeconfig and certificates
         run: |
-          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
-          echo "${{ secrets.MINIKUBE_CLIENT_CERT }}" > $HOME/.minikube/profiles/minikube/client.crt
-          echo "${{ secrets.MINIKUBE_CLIENT_KEY }}" > $HOME/.minikube/profiles/minikube/client.key
-          echo "${{ secrets.MINIKUBE_CA_CERT }}" > $HOME/.minikube/ca.crt
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+          echo "${{ secrets.MINIKUBE_CLIENT_CERT }}" | base64 -d > $HOME/.minikube/profiles/minikube/client.crt
+          echo "${{ secrets.MINIKUBE_CLIENT_KEY }}" | base64 -d > $HOME/.minikube/profiles/minikube/client.key
+          echo "${{ secrets.MINIKUBE_CA_CERT }}" | base64 -d > $HOME/.minikube/ca.crt
 
       - name: Deploy to Kubernetes
         run: |
