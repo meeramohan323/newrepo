@@ -23,6 +23,7 @@ jobs:
           minikube start --driver=docker
 
       # Step 3: Set up kubeconfig and certificates
+      - name: Set up kubeconfig and certificates
         env:
           HOME: /home/runner  # Set the home directory for the runner
         run: |
