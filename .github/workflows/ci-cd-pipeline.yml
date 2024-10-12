@@ -1,12 +1,12 @@
-name: CI/CD Pipeline
+kname: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - main  # Change this to your default branch if needed
   pull_request:
     branches:
-      - main
+      - main  # Change this to your default branch if needed
 
 jobs:
   build:
@@ -30,12 +30,11 @@ jobs:
         with:
           context: .
           push: true
-          tags: meeramohan323/wisecow:latest
+          tags: meeramohan323/wisecow:latest  # Change this to your Docker Hub repo
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -43,21 +42,37 @@ jobs:
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
         with:
-          version: 'latest'
+          version: 'latest'  # Use 'latest' to always get the latest version
 
       - name: Create kube and minikube directories
         run: |
           mkdir -p $HOME/.kube
           mkdir -p $HOME/.minikube/profiles/minikube
 
-      - name: Set kubeconfig and certificates
+      - name: Set kubeconfig
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-          echo "${{ secrets.MINIKUBE_CLIENT_CERT }}" | base64 -d > $HOME/.minikube/profiles/minikube/client.crt
-          echo "${{ secrets.MINIKUBE_CLIENT_KEY }}" | base64 -d > $HOME/.minikube/profiles/minikube/client.key
-          echo "${{ secrets.MINIKUBE_CA_CERT }}" | base64 -d > $HOME/.minikube/ca.crt
+          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
+          echo "${{ secrets.MINIKUBE_CLIENT_CERT }}" | base64 --decode > $HOME/.minikube/profiles/minikube/client.crt
+          echo "${{ secrets.MINIKUBE_CLIENT_KEY }}" | base64 --decode > $HOME/.minikube/profiles/minikube/client.key
+          echo "${{ secrets.MINIKUBE_CA_CERT }}" | base64 --decode > $HOME/.minikube/ca.crt  # If required
+
+      - name: List kube directory permissions
+        run: ls -la $HOME/.kube
+
+      - name: List minikube directory permissions
+        run: ls -la $HOME/.minikube/profiles/minikube
+
+      - name: Change permissions for kubeconfig
+        run: chmod 644 $HOME/.kube/config
+
+      - name: Change permissions for minikube client cert
+        run: chmod 644 $HOME/.minikube/profiles/minikube/client.crt
+
+      - name: Change permissions for minikube client key
+        run: chmod 600 $HOME/.minikube/profiles/minikube/client.key
 
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
+
