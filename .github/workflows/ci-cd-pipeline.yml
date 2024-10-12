@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Change this to your default branch if needed
+      - main
   pull_request:
     branches:
-      - main  # Change this to your default branch if needed
+      - main
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: meeramohan323/wisecow:latest  # Change this to your Docker Hub repo
+          tags: meeramohan323/wisecow:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -39,22 +39,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install Minikube
+        run: |
+          curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          sudo install minikube /usr/local/bin/
+          minikube start --driver=docker
+
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
         with:
-          version: 'latest'  # Use 'latest' to always get the latest version
+          version: 'latest'
 
       - name: Create kube and minikube directories
         run: |
           mkdir -p $HOME/.kube
           mkdir -p $HOME/.minikube/profiles/minikube
-     
-      - name: Set kubeconfig
+
+      - name: Set kubeconfig and Minikube certificates
         run: |
           echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
           echo "${{ secrets.MINIKUBE_CLIENT_CERT }}" > $HOME/.minikube/profiles/minikube/client.crt
           echo "${{ secrets.MINIKUBE_CLIENT_KEY }}" > $HOME/.minikube/profiles/minikube/client.key
           echo "${{ secrets.MINIKUBE_CA_CERT }}" > $HOME/.minikube/ca.crt
+
+      - name: Verify kubeconfig and certificates
+        run: |
+          ls -la $HOME/.kube
+          ls -la $HOME/.minikube/profiles/minikube
+          cat $HOME/.kube/config
+          cat $HOME/.minikube/profiles/minikube/client.crt
+          cat $HOME/.minikube/profiles/minikube/client.key
+          cat $HOME/.minikube/ca.crt
 
       - name: Deploy to Kubernetes
         run: |
