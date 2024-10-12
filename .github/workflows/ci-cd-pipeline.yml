@@ -56,11 +56,38 @@ jobs:
           echo "${{ secrets.MINIKUBE_CLIENT_KEY }}" | base64 --decode > $HOME/.minikube/profiles/minikube/client.key
           echo "${{ secrets.MINIKUBE_CA_CERT }}" | base64 --decode > $HOME/.minikube/ca.crt  # If required
 
-      - name: List kube directory permissions
-        run: ls -la $HOME/.kube
+      # Debugging steps
+      - name: Check if kubeconfig exists
+        run: |
+          if [ -f $HOME/.kube/config ]; then
+            echo "Kubeconfig exists."
+          else
+            echo "Kubeconfig does not exist."
+          fi
 
-      - name: List minikube directory permissions
-        run: ls -la $HOME/.minikube/profiles/minikube
+      - name: Check if minikube client cert exists
+        run: |
+          if [ -f $HOME/.minikube/profiles/minikube/client.crt ]; then
+            echo "Minikube client cert exists."
+          else
+            echo "Minikube client cert does not exist."
+          fi
+
+      - name: Check if minikube client key exists
+        run: |
+          if [ -f $HOME/.minikube/profiles/minikube/client.key ]; then
+            echo "Minikube client key exists."
+          else
+            echo "Minikube client key does not exist."
+          fi
+
+      - name: Check if minikube CA cert exists
+        run: |
+          if [ -f $HOME/.minikube/ca.crt ]; then
+            echo "Minikube CA cert exists."
+          else
+            echo "Minikube CA cert does not exist."
+          fi
 
       - name: Change permissions for kubeconfig
         run: chmod 644 $HOME/.kube/config
@@ -71,8 +98,13 @@ jobs:
       - name: Change permissions for minikube client key
         run: chmod 600 $HOME/.minikube/profiles/minikube/client.key
 
+      - name: List kube directory contents
+        run: ls -la $HOME/.kube
+
+      - name: List minikube directory contents
+        run: ls -la $HOME/.minikube/profiles/minikube
+
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f deployment.yaml
           kubectl apply -f service.yaml
-
