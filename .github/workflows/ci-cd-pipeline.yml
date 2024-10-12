@@ -23,23 +23,24 @@ jobs:
           minikube start --driver=docker
 
       # Step 3: Set up kubeconfig and certificates
+      - name: Set up kubeconfig and certificates
         env:
           HOME: /home/runner  # Set the home directory for the runner
         run: |
           # Create necessary directories
           mkdir -p $HOME/.minikube/profiles/minikube
           mkdir -p $HOME/.kube
-
+          
           # Decode the secrets and create the certificate files
           echo "${{ secrets.MINIKUBE_CA_CERT }}" | base64 -d > $HOME/.minikube/ca.crt
           echo "${{ secrets.MINIKUBE_CLIENT_CERT }}" | base64 -d > $HOME/.minikube/profiles/minikube/client.crt
           echo "${{ secrets.MINIKUBE_CLIENT_KEY }}" | base64 -d > $HOME/.minikube/profiles/minikube/client.key
-
+          
           # Set appropriate permissions
           chmod 600 $HOME/.minikube/profiles/minikube/client.crt
           chmod 600 $HOME/.minikube/profiles/minikube/client.key
           chmod 600 $HOME/.minikube/ca.crt
-
+          
           # Set up kubeconfig file
           cat <<EOF > $HOME/.kube/config
 apiVersion: v1
