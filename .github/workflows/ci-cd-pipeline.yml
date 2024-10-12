@@ -1,12 +1,12 @@
-name: CI/CD Pipeline
+kname: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main  # Change this to your default branch if needed
+      - main
   pull_request:
     branches:
-      - main  # Change this to your default branch if needed
+      - main
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: meeramohan323/wisecow:latest  # Change this to your Docker Hub repo
+        tags: meeramohan323/wisecow:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -42,7 +42,10 @@ jobs:
     - name: Set up kubectl
       uses: azure/setup-kubectl@v1
       with:
-        version: '1.31.1'  # Use the same version as your local setup
+        version: 'latest'  # Use 'latest' to always get the latest version
+
+    - name: Create kube directory
+      run: mkdir -p $HOME/.kube  # This step creates the .kube directory
 
     - name: Set kubeconfig
       run: echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
@@ -51,3 +54,4 @@ jobs:
       run: |
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
+
