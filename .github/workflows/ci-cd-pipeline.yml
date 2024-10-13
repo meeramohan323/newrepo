@@ -9,7 +9,7 @@ on:
       - main  # or your default branch
 
 jobs:
-  deploy:
+  build-deploy:
     runs-on: ubuntu-latest
 
     steps:
