@@ -2,12 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wisecow-service
-  labels:
-    app: wisecow
 spec:
-  type: LoadBalancer  # Use LoadBalancer to expose the service externally
+  type: LoadBalancer  # Change to NodePort if necessary for testing
   ports:
-    - port: 80         # The port that will be exposed externally
-      targetPort: 4499 # The port your container is listening on
+  - port: 80  # Port exposed outside
+    targetPort: 80  # Port on the container
   selector:
-    app: wisecow       # This selector should match your deployment labels
+    app: wisecow  # This should match the labels in your deployment

@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wisecow-deployment
+  name: wisecow
   labels:
     app: wisecow
 spec:
-  replicas: 3  # Increase replicas for better availability (adjust as needed)
+  replicas: 3  # Number of pod replicas
   selector:
     matchLabels:
       app: wisecow
@@ -15,14 +15,19 @@ spec:
         app: wisecow
     spec:
       containers:
-        - name: wisecow
-          image: meeramohan323/wisecow:latest  # Ensure this is correct
-          ports:
-            - containerPort: 4499  # Keep the container port as is
-          resources:  # Optional: Define resource requests and limits
-            requests:
-              memory: "256Mi"  # Minimum memory required
-              cpu: "500m"      # Minimum CPU required
-            limits:
-              memory: "512Mi"  # Maximum memory
-              cpu: "1"         # Maximum CPU
+      - name: wisecow
+        image: gcr.io/pure-spirit-123456-m1/wisecow:latest  # Update with your image name
+        ports:
+        - containerPort: 80  # Port your application listens to
+        env:
+        - name: ENV_VAR_NAME  # Example of setting environment variables
+          value: "production"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+      imagePullSecrets:  # Optional, if using private images
+      - name: regcred  # This should match the secret name for your container registry
